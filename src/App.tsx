@@ -1,25 +1,33 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import { AuthProvider } from './lib/contexts/AuthContext';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { RequireAuth } from './lib/components/RequiredAuth';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <div className="chi-main" style={{ height: '100vh' }}>
+          <Routes>
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <RequireAuth>
+                  <DashboardPage />
+                </RequireAuth>
+              }
+            />
+          </Routes>
+        </div>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
