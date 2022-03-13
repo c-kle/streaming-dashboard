@@ -5,6 +5,8 @@ import DashboardPage from './pages/DashboardPage';
 import { AuthProvider } from './lib/contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { RequireAuth } from './lib/components/RequiredAuth';
+import './App.css';
+import '../node_modules/react-vis/dist/style.css';
 
 const queryClient = new QueryClient();
 
