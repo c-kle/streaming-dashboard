@@ -14,7 +14,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="chi-main" style={{ height: '100vh' }}>
+        <div className="chi-main">
           <Routes>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
             <Route path="login" element={<LoginPage />} />

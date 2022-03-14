@@ -29,25 +29,31 @@ export const LoginPage = () => {
 
   return (
     <div className="chi-main__content">
-      <form onSubmit={handleSubmit}>
-        <div className="chi-form__item">
-          <label className="chi-label" htmlFor="username">
-            Username
-          </label>
-          <input type="text" className="chi-input" name="username" id="username" />
-        </div>
-        <div className="chi-form__item">
-          <label className="chi-label" htmlFor="password">
-            Password
-          </label>
-          <input type="text" className="chi-input" name="password" id="password" />
-        </div>
-        <div className="chi-form__item">
-          <div className="chi-main__header-end">
-            <input className="chi-button -primary" type="submit" value="Log in" />
+      <div className="chi-grid">
+        <div className="chi-col -w--4 -o--4">
+          <div className="chi-card">
+            <div className="chi-card__content">
+              <form onSubmit={handleSubmit}>
+                <div className="chi-form__item -my--3">
+                  <label className="chi-label" htmlFor="username">
+                    Username
+                  </label>
+                  <input type="text" className="chi-input" name="username" id="username" />
+                </div>
+                <div className="chi-form__item -my--3">
+                  <label className="chi-label" htmlFor="password">
+                    Password
+                  </label>
+                  <input type="password" className="chi-input" name="password" id="password" />
+                </div>
+                <div className="-my--3 -d--flex -justify-content--end">
+                  <input className="chi-button -primary" type="submit" value="Log in" />
+                </div>
+              </form>
+            </div>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
