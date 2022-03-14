@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { useQuery } from 'react-query';
 import {
   XYPlot,
   XAxis,
@@ -12,6 +12,7 @@ import {
   DiscreteColorLegend,
 } from 'react-vis';
 import { bandwidth, bandwidthAggregate } from '../apiClient/bandwidth';
+import { isAxiosErrorStatus } from '../apiClient/utils';
 import { useAuth } from '../hooks/useAuth';
 import { useChartFilter } from '../hooks/useChartFilter';
 import { msToDays, toDateString, toDateTimeString, toGbps } from '../utils';
@@ -33,6 +34,8 @@ const CHARTS_CONFIG = {
 
 const CHART_LEGEND_ITEMS = Object.values(CHARTS_CONFIG);
 
+const retry = (count: number, error: unknown) => !isAxiosErrorStatus(error, 404);
+
 export const CapacityOffloadChart = (props: { height: number; width: number }) => {
   const { filter } = useChartFilter();
   const { token } = useAuth();
@@ -49,6 +52,7 @@ export const CapacityOffloadChart = (props: { height: number; width: number }) =
       p2p: data.p2p.map(([x, y]) => ({ x, y })),
       cdn: data.cdn.map(([x, y]) => ({ x, y })),
     }),
+    retry,
   });
   const { data: maxesData, refetch: refetchMaxesData } = useQuery({
     queryKey: ['maxes'],
@@ -60,6 +64,7 @@ export const CapacityOffloadChart = (props: { height: number; width: number }) =
       p2p: bandwithData?.p2p.map(({ x }) => ({ x, y: data.p2p })),
       cdn: bandwithData?.cdn.map(({ x }) => ({ x, y: data.cdn })),
     }),
+    retry,
   });
 
   const hooverHandler: RVNearestXEventHandler<AreaSeriesPoint> = (data, { index }) => {
@@ -75,10 +80,6 @@ export const CapacityOffloadChart = (props: { height: number; width: number }) =
     refetchBandwithData();
     refetchMaxesData();
   }, [filter.from, filter.to]);
-
-  if (!bandwithData || !maxesData) {
-    return null;
-  }
 
   return (
     <div className="chi-card">
@@ -97,24 +98,24 @@ export const CapacityOffloadChart = (props: { height: number; width: number }) =
           <YAxis tickTotal={4} tickFormat={toGbps} />
           <AreaSeries
             curve="curveBasis"
-            data={bandwithData.p2p}
+            data={bandwithData?.p2p ?? []}
             opacity={0.25}
             onNearestX={hooverHandler}
             color={CHARTS_CONFIG.p2p.color}
           />
           <AreaSeries
             curve="curveBasis"
-            data={bandwithData.cdn}
+            data={bandwithData?.cdn ?? []}
             opacity={0.25}
             color={CHARTS_CONFIG.http.color}
           />
           <LineSeries
-            data={maxesData.p2p}
+            data={maxesData?.p2p ?? []}
             strokeStyle="dashed"
             color={CHARTS_CONFIG.maxP2p.color}
           />
           <LineSeries
-            data={maxesData.cdn}
+            data={maxesData?.cdn ?? []}
             strokeStyle="dashed"
             color={CHARTS_CONFIG.maxHttp.color}
           />

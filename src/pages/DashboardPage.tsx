@@ -4,7 +4,7 @@ import { ConcurrentViewersChart } from '../lib/components/ConcurrentViewersChart
 import { BrushChart } from '../lib/components/BrushChart';
 import { ChartFilterProvider } from '../lib/contexts/ChartFilterContext';
 import { useEffect, useRef, useState } from 'react';
-import { axiosInstance, isAxiosError } from '../lib/apiClient/utils';
+import { axiosInstance, isAxiosErrorStatus } from '../lib/apiClient/utils';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/hooks/useAuth';
 import { useQueryClient } from 'react-query';
@@ -37,7 +37,7 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     const interceptorId = axiosInstance.interceptors.response.use(undefined, (error) => {
-      if (isAxiosError(error) && error.response?.status === 403) {
+      if (isAxiosErrorStatus(error, 403)) {
         queryClient.cancelQueries();
 
         setLoggingOut(true);
