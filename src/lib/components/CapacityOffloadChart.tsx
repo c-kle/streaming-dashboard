@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import {
   XYPlot,
@@ -12,24 +12,28 @@ import {
 } from 'react-vis';
 import { bandwidth, bandwidthAggregate } from '../apiClient/bandwidth';
 import { useAuth } from '../hooks/useAuth';
-import { toDateString, toGbps } from '../utils';
+import { useChartFilter } from '../hooks/useChartFilter';
+import { msToDays, toDateString, toGbps } from '../utils';
 
 export const CapacityOffloadChart = () => {
+  const { filter } = useChartFilter();
   const { token } = useAuth();
-  //   const [, setHoveredValue] = useState({ x: 0, y: 0 });
   const [crosshairValues, setCrosshairValues] = useState<{ x: number; y: number }[]>([]);
-  //   const debouncedCrosshairValues = useDebounce(crosshairValues, 50);
-  const from = 1509490800000;
-  const to = Date.now();
-  const { data: bandwithData } = useQuery(['bandwith'], () =>
-    bandwidth({ session_token: token, to, from }),
-  );
-  const { data: maxesData } = useQuery(['maxes'], () =>
-    bandwidthAggregate({ session_token: token, to, from, aggregate: 'max' }),
-  );
+
+  const from = filter.from;
+  const to = filter.to;
+
+  const { data: bandwithData, refetch: refetchBandwithData } = useQuery({
+    queryKey: ['bandwith'],
+    enabled: false,
+    queryFn: () => bandwidth({ session_token: token, to, from }),
+  });
+  const { data: maxesData, refetch: refetchMaxesData } = useQuery({
+    queryKey: ['maxes'],
+    enabled: false,
+    queryFn: () => bandwidthAggregate({ session_token: token, to, from, aggregate: 'max' }),
+  });
   const hooverHandler: RVNearestXEventHandler<AreaSeriesPoint> = (data, { index }) => {
-    // console.log({ data, e });
-    // setHoveredValue(data);
     setCrosshairValues([
       //   data,
       { x: data.x, y: maxesData?.cdn || 0 },
@@ -37,6 +41,11 @@ export const CapacityOffloadChart = () => {
       //   { x: bandwithData?.cdn[index][0], y: bandwithData?.cdn[index][1] },
     ]);
   };
+
+  useEffect(() => {
+    refetchBandwithData();
+    refetchMaxesData();
+  }, [filter.from, filter.to]);
 
   if (!bandwithData || !maxesData) {
     return null;
@@ -60,7 +69,7 @@ export const CapacityOffloadChart = () => {
       }}
       onMouseLeave={() => setCrosshairValues([])}
     >
-      <XAxis tickTotal={15} tickFormat={toDateString} />
+      <XAxis tickTotal={msToDays(to - from)} tickFormat={toDateString} />
       <YAxis tickTotal={5} tickFormat={toGbps} />
       <AreaSeries
         curve="curveBasis"
