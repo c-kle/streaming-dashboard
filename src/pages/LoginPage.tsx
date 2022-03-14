@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useMutation } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { auth } from '../lib/apiClient';
+import { isAxiosError } from '../lib/apiClient/utils';
 import { useAuth } from '../lib/hooks/useAuth';
 
 export const LoginPage = () => {
@@ -21,7 +21,7 @@ export const LoginPage = () => {
       navigate(from, { replace: true });
     },
     onError: (error) => {
-      if (!axios.isAxiosError(error) || error.response?.status === 503) {
+      if (!isAxiosError(error) || error.response?.status === 503) {
         setErrorMessage('An error occured');
       } else if (error.response?.status === 404) {
         setErrorMessage('Incorrect username or password');

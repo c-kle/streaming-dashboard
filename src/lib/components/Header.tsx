@@ -19,7 +19,9 @@ export const Header = () => {
   const logout = () => mutate({ session_token: token });
 
   useEffect(() => {
-    chi.dropdown(document.getElementById('profile-dropdown'));
+    const dropdown = chi.dropdown(document.getElementById('profile-dropdown'));
+
+    return () => dropdown.dispose();
   }, []);
 
   return (

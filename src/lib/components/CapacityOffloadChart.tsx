@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryOptions } from 'react-query';
 import {
   XYPlot,
   XAxis,
@@ -61,6 +61,7 @@ export const CapacityOffloadChart = (props: { height: number; width: number }) =
       cdn: bandwithData?.cdn.map(({ x }) => ({ x, y: data.cdn })),
     }),
   });
+
   const hooverHandler: RVNearestXEventHandler<AreaSeriesPoint> = (data, { index }) => {
     setCrosshairValues([
       data,

@@ -1,4 +1,4 @@
-import { makePostAPICall } from './makePostAPICall';
+import { makePostAPICall } from './utils';
 import SessionToken from './resources/sessionToken';
 
 type BandwidthPayload = SessionToken & {
