@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const axiosInstance = axios.create({});
+export const axiosInstance = axios.create({ baseURL: process.env.REACT_APP_API_BASE_URL || '' });
 
 export const isAxiosError = axios.isAxiosError;
 export const isAxiosErrorStatus = (error: unknown, status: number) =>

@@ -8,6 +8,7 @@ import { axiosInstance, isAxiosErrorStatus } from '../lib/apiClient/utils';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/hooks/useAuth';
 import { useQueryClient } from 'react-query';
+import { useWindowSize } from '../lib/hooks/useWindowSize';
 
 const DEFAULT_MARGIN = 50;
 const DEFAULT_WIDTH = 900 + DEFAULT_MARGIN;
@@ -20,20 +21,13 @@ export const DashboardPage = () => {
   const navigate = useNavigate();
   const { setToken } = useAuth();
   const [width, setWidth] = useState(processWidth(contentRef.current?.clientWidth));
+  const { windowSize } = useWindowSize();
   const [loggingOut, setLoggingOut] = useState(false);
 
   const logout = () => {
     setToken('');
     navigate('/login');
   };
-
-  useEffect(() => {
-    const handler = () => setWidth(processWidth(contentRef.current?.clientWidth));
-
-    window.addEventListener('resize', handler);
-
-    return () => window.removeEventListener('resize', handler);
-  }, []);
 
   useEffect(() => {
     const interceptorId = axiosInstance.interceptors.response.use(undefined, (error) => {
@@ -53,7 +47,7 @@ export const DashboardPage = () => {
     if (contentRef.current) {
       setWidth(processWidth(contentRef.current?.clientWidth));
     }
-  }, [contentRef.current]);
+  }, [contentRef.current, windowSize]);
 
   return (
     <ChartFilterProvider>
